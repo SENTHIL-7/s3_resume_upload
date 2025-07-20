@@ -1,6 +1,7 @@
 import { useEffect, useState, type ChangeEvent } from 'react'
 import './App.css'
 import axios from "./api";
+import axiosBase from "axios"; 
 function App() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -23,22 +24,27 @@ function App() {
   };
 
   const uploadFile = async () => {
-    if (!file) return alert('Please select a file');
+    try{
+         if (!file) return alert('Please select a file');
 
-    const { data } = await axios.get('http://localhost:4000/get-signed-url', {
+    const { data } = await axios.get('/get-signed-url', {
       params: {
-        fileName: file.name,
+        fileName: 'resume.pdf',
         fileType: file.type
       }
     });
-
-    await axios.put(data.url, file, {
+    await axiosBase.put(data.url, file, {
       headers: {
         'Content-Type': file.type
       }
     });
 
     alert('File uploaded successfully');
+    } 
+    catch (error){
+      console.error(error)
+    }
+ 
   };
   return (
     <>
@@ -52,7 +58,7 @@ function App() {
         )}
         {!preview && <p>Upload a file</p>}
         <br />
-        <input type="file" onChange={handleFileChange} accept="image/*,application/pdf" />
+        <input type="file" onChange={handleFileChange}  accept="application/pdf" />
 
         <button onClick={uploadFile} style={{ marginTop: '1rem' }}>Upload</button>
       </div >
